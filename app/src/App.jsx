@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import Layout from './components/Layout'
-import ProtectedRoute from './components/ProtectedRoute'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import AnimalDetail from './pages/AnimalDetail'
-import NewAnimal from './pages/NewAnimal'
+import Layout from '@/layout/Layout'
+import ProtectedRoute from '@/layout/ProtectedRoute'
+import Login from '@/pages/Login'
+import Dashboard from '@/pages/Dashboard'
+import AnimalDetail from '@/pages/AnimalDetail'
+import NewAnimal from '@/pages/NewAnimal'
 
 /**
  * Table de routage de l'application.

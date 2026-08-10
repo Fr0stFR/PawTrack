@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { apiGet } from '../api'
+import { apiGet } from '@/api'
 
 /**
  * Encapsule le cycle de vie d'une requête GET : chargement, erreur, données.

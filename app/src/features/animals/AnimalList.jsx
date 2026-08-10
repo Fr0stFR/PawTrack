@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import Icon from './Icon'
+import Icon from '@/components/ui/Icon'
 import styles from './AnimalList.module.css'
 
 /**
