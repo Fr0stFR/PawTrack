@@ -1,0 +1,106 @@
+.detail {
+  padding-bottom: 40px;
+}
+
+.back {
+  display: inline-block;
+  margin: 16px 0;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.back:hover {
+  color: var(--accent);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  /* Un SVG FontAwesome se colore via `currentColor` (cf. AnimalList). */
+  color: var(--accent);
+}
+
+.meta {
+  color: var(--text-muted);
+}
+
+/* Les 3 panneaux empilés, bien espacés. */
+.grid {
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  gap: 24px;
+  align-items: start;
+
+  /* Mobile : les deux panneaux passent l'un sous l'autre. */
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pageState {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 48px 20px;
+}
+
+/* Colonne d'actions : boutons empilés, pleine largeur (align-items:stretch
+   est le défaut d'un flex column → les boutons prennent toute la largeur). */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* dvh et non vh : sur mobile, `vh` ignore la barre d'adresse et déborde. */
+.scrollBody {
+  max-height: 38dvh;
+  overflow-y: auto;
+
+  /* Réserve la gouttière de la scrollbar en permanence : le contenu ne
+     "saute" pas de quelques pixels quand la barre apparaît/disparaît. */
+  scrollbar-gutter: stable;
+
+  /* Arrivé en bas de la liste, on ne "contamine" pas le scroll de la page :
+     la molette s'arrête là au lieu de faire défiler tout le document. */
+  overscroll-behavior: contain;
+}
+
+/* Mobile : les cartes s'empilent déjà, un plafond aussi bas donnerait des
+   mini-fenêtres illisibles. On desserre. */
+@media (max-width: 768px) {
+  .scrollBody {
+    max-height: 60dvh;
+  }
+}
+
+.more {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.more:hover {
+  border-color: var(--accent);
+}

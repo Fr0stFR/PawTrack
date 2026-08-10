@@ -1,0 +1,16 @@
+/* Styles partagés par les formulaires (form + erreur d'envoi).
+   Le style des CHAMPS vit dans Field.module.css. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.submitError {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}

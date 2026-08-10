@@ -1,0 +1,38 @@
+/* Un formulaire n'a pas besoin de toute la largeur : au-delà, les champs
+   deviennent des rubans illisibles et l'œil perd le fil entre label et champ. */
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.back {
+  display: inline-block;
+  margin: 16px 0;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.back:hover {
+  color: var(--accent);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  color: var(--accent);
+}

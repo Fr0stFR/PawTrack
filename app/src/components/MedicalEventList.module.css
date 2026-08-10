@@ -1,0 +1,103 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+/* Événement oublié : on passe l'accent en rouge pour qu'il saute aux yeux. */
+.overdue {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* Événement déjà fait : accent vert, l'affaire est classée.
+   Volontairement PAS de `background: var(--success-soft)` ici, contrairement
+   à .overdue : tout l'historique est "fait", un fond vert sur chaque ligne
+   ferait un mur de couleur qui ne signale plus rien. Le rouge doit rester
+   la seule couleur qui attrape l'oeil. */
+.done {
+  border-left-color: var(--success);
+}
+
+/* Une ligne du carnet. `baseline` (et non `center`) aligne les textes sur leur
+   ligne d'écriture : indispensable quand on mélange deux tailles de police. */
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.type {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.overdue .type {
+  color: var(--danger);
+}
+
+.done .type {
+  color: var(--success);
+}
+
+.name {
+  font-weight: 600;
+  color: var(--text-h);
+
+  /* flex:1 → le nom mange toute la place libre et repousse la date à droite.
+     min-width:0 → l'autorise à rétrécir sous la largeur de son texte, sinon
+     un nom très long pousserait la date hors de la carte au lieu de se
+     tronquer. C'est le même réflexe que le min-width:0 de Card. */
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  /* Chiffres à largeur fixe : les dates s'alignent verticalement d'une
+     ligne à l'autre, comme dans un vrai registre. */
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Poussé à droite de sa ligne : `margin-left:auto` absorbe tout l'espace
+   libre à gauche du badge. */
+.badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-pill);
+  padding: 1px 8px;
+}

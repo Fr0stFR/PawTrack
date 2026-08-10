@@ -1,0 +1,25 @@
+api_platform:
+    title: Hello API Platform
+    version: 1.0.0
+    swagger:
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header
+    # Formats de données activés (négociation de contenu).
+    # L'ordre compte : le 1er est le format par défaut si le client
+    # ne précise rien. On garde jsonld en défaut (pour les docs/Hydra),
+    # et on AJOUTE json pour que la SPA React puisse dialoguer en JSON simple.
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        # Autorise le client à piloter la taille de page (?itemsPerPage=10).
+        # Sans ça, le paramètre est SILENCIEUSEMENT ignoré.
+        pagination_client_items_per_page: true
+        # Plafond de sécurité : personne ne peut demander 100 000 lignes.
+        pagination_maximum_items_per_page: 50
+    

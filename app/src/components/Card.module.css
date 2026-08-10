@@ -1,0 +1,48 @@
+/* Le panneau doux, réutilisable partout dans l'app. */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+/* En-tête du panneau : titre à gauche, action éventuelle à droite.
+   C'est lui qui porte désormais l'espace avant le corps (avant, c'était la
+   marge basse du .title).
+   flex-wrap : sur un écran étroit, l'action passe sous le titre au lieu
+   d'écraser les deux. */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* On annule la marge globale du <h2> (le padding de la carte gère déjà l'espace).
+   `margin-right: auto` = le ressort qui pousse le titre à gauche et l'action à
+   droite. Avantage sur `space-between` : ça marche aussi quand il n'y a QUE
+   l'action (elle reste à droite au lieu de sauter à gauche). */
+.title {
+  margin: 0 auto 0 0;
+}
+
+/* L'icône du titre : couleur d'accent, légèrement plus petite que le texte
+   pour ne pas voler la vedette au libellé. */
+.icon {
+  margin-right: 10px;
+  color: var(--accent);
+  font-size: 0.85em;
+}
+
+/* Corps de la carte. Par défaut il ne fait rien de spécial : c'est un point
+   d'accroche que les pages peuvent enrichir via la prop `bodyClassName`
+   (typiquement pour y poser un max-height + overflow).
+   `min-width: 0` évite qu'un texte très long ne fasse déborder la carte
+   quand elle est placée dans une grille. */
+.body {
+  min-width: 0;
+}

@@ -1,0 +1,24 @@
+
+# Les secrets vivent exclusivement dans .env.local, jamais dans un fichier
+# versionné. .env.dev est ignoré car il est chargé APRÈS .env.local et
+# l'écraserait : y placer une valeur reviendrait à la committer.
+/.env.dev
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###

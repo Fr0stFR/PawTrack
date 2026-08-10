@@ -1,0 +1,25 @@
+lexik_jwt_authentication:
+    secret_key: '%env(resolve:JWT_SECRET_KEY)%'
+    public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
+    pass_phrase: '%env(JWT_PASSPHRASE)%'
+
+    # Où LIRE le JWT sur les requêtes entrantes.
+    token_extractors:
+        # Lecture depuis un cookie nommé BEARER (le mode principal désormais).
+        cookie:
+            enabled: true
+            name: BEARER
+        # On garde aussi le header Authorization : pratique pour curl/tests.
+        authorization_header:
+            enabled: true
+            prefix: Bearer
+            name: Authorization
+
+    # Au login réussi, Lexik DÉPOSE le JWT dans un cookie (Set-Cookie)
+    # au lieu de le renvoyer dans le corps JSON.
+    set_cookies:
+        BEARER:
+            httpOnly: true                            # invisible au JS → anti vol XSS
+            secure: '%env(bool:JWT_COOKIE_SECURE)%'   # false en dev (http), true en prod (https)
+            samesite: lax                             # anti-CSRF : cookie envoyé seulement en same-site
+            path: /

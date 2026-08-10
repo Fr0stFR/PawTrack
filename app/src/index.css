@@ -1,0 +1,132 @@
+:root {
+  /* === Design tokens PawTrack — DA "Doux & rassurant" ===================
+     Source de vérité partagée. Les composants (CSS Modules) consomment ces
+     variables, ils ne les redéfinissent pas. */
+
+  /* Texte */
+  --text: #6b6470;        /* gris chaud pour le corps */
+  --text-h: #2e2a33;      /* presque noir chaud pour les titres */
+  --text-muted: #9a93a0;  /* légendes, texte secondaire */
+
+  /* Surfaces */
+  --bg: #fbf8f3;          /* fond de page crème */
+  --surface: #ffffff;     /* cartes, panneaux */
+  --border: #ece6dd;      /* traits fins, chaleureux */
+
+  /* Accent principal : corail */
+  --accent: #f2795e;
+  --accent-hover: #e5643f;
+  --accent-soft: rgba(242, 121, 94, 0.12);   /* fonds d'accent doux */
+
+  /* Accent secondaire : vert sauge (états "ok", validé) */
+  --sage: #7fa88b;
+  --sage-soft: rgba(127, 168, 139, 0.14);
+
+  /* États sémantiques (repris par les flash) */
+  --danger: #c5443b;
+  --danger-soft: #fbe9e7;
+  --success: #3f8f5b;
+  --success-soft: #e7f4ec;
+
+  /* Rayons & ombres — arrondis généreux, ombres douces */
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+  --shadow: 0 4px 18px rgba(58, 43, 30, 0.06), 0 1px 3px rgba(58, 43, 30, 0.05);
+  --shadow-hover: 0 8px 28px rgba(58, 43, 30, 0.10);
+
+  /* Espacement de base (échelle simple) */
+  --space: 16px;
+
+  /* Typographie */
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font: 17px/150% var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #b3adb8;
+    --text-h: #f3eff4;
+    --text-muted: #7f7986;
+
+    --bg: #1a191e;
+    --surface: #232128;
+    --border: #34313b;
+
+    --accent: #ff8a72;
+    --accent-hover: #ff9d88;
+    --accent-soft: rgba(255, 138, 114, 0.16);
+
+    --sage: #8fb89a;
+    --sage-soft: rgba(143, 184, 154, 0.18);
+
+    --danger: #f0857c;
+    --danger-soft: rgba(197, 68, 59, 0.18);
+    --success: #7fc194;
+    --success-soft: rgba(63, 143, 91, 0.18);
+
+    --shadow: 0 4px 18px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25);
+    --shadow-hover: 0 8px 28px rgba(0, 0, 0, 0.45);
+  }
+}
+
+body {
+  margin: 0;
+}
+
+/* Coque de l'app : une colonne centrée, lisible, alignée à gauche
+   (le template Vite la centrait sur 1126px, peu adapté à un dashboard). */
+#root {
+  max-width: 70%;
+  margin: 0 auto;
+  padding: 0 20px;
+  min-height: 100svh;
+  box-sizing: border-box;
+
+  /* Mobile : on passe pleine largeur (60% serait bien trop étroit). */
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--heading);
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 34px;
+  letter-spacing: -0.5px;
+  margin: 28px 0 16px;
+  @media (max-width: 1024px) {
+    font-size: 28px;
+    margin: 20px 0 12px;
+  }
+}
+
+h2 {
+  font-size: 22px;
+  letter-spacing: -0.2px;
+  margin: 24px 0 12px;
+}
+
+p {
+  margin: 0;
+}

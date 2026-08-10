@@ -1,0 +1,43 @@
+/* Toast flottant, commun à tous les flash messages */
+.flash {
+  position: fixed;
+  top: 1rem;
+  /* Centrage horizontal : on colle le bord gauche au milieu (50%),
+     puis on recule l'élément de la moitié de SA largeur (-50%). */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Animation d'apparition : glisse depuis le haut en s'opacifiant */
+  animation: flash-in 0.25s ease-out;
+}
+
+/* Les keyframes gardent translateX(-50%) pour rester centré pendant l'anim. */
+@keyframes flash-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Variante succès (vert) */
+.flash-success {
+  background: #e6f4ea;
+  color: #1e7e34;
+  border-color: #b7dfc1;
+}
+
+/* Variante erreur (rouge) */
+.flash-danger {
+  background: #fce8e6;
+  color: #c5221f;
+  border-color: #f3b9b5;
+}

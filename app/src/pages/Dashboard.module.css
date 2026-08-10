@@ -1,0 +1,56 @@
+/* Styles SCOPÉS au Dashboard. Les classes sont en camelCase pour être
+   lisibles en JS (styles.header, pas styles['header-truc']). */
+
+.dashboard {
+  padding-bottom: 40px;
+}
+
+/* En-tête de page : titre à gauche, bouton d'action à droite. */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.addLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+  text-decoration: none;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.addLink:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.addLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* (Les états loading/erreur/vide ont déménagé dans AsyncSection.module.css) */
+
+/* Layout du dashboard : 2 colonnes sur PC.
+   Les "fr" = les proportions : 7fr 3fr → 70/30. Change ces deux chiffres
+   pour ajuster (2fr 1fr ≈ 67/33, 3fr 1fr = 75/25, 1fr 1fr = 50/50).
+   align-items: start → chaque carte garde sa hauteur naturelle. */
+.grid {
+  display: grid;
+  grid-template-columns: 7fr 3fr;
+  gap: 24px;
+  align-items: start;
+
+  /* Mobile : les deux panneaux passent l'un sous l'autre. */
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,67 @@
+/* La grille : des cartes qui se répartissent et repassent à la ligne toutes
+   seules. auto-fill + minmax = "autant de colonnes de ≥170px que possible". */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, 1fr); /* PC : 3 par ligne → ~33% par carte */
+
+  /* Mobile : 1 seule colonne → chaque carte prend 100% */
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Une carte animal : douce, cliquable au ressenti (léger soulèvement au survol). */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  /* .card est maintenant un <Link> : on neutralise le style de lien. */
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+  background: var(--accent-soft);
+}
+
+/* Pastille "avatar" en attendant les vraies photos (champ `photo` plus tard). */
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  /* L'emoji portait ses propres couleurs ; un SVG FontAwesome hérite de
+     `currentColor`. Sans cette ligne, la patte prendrait la couleur du texte. */
+  color: var(--accent);
+}
+
+.name {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* Espèce · race, sous le nom. Le `gap: 10px` de .card est un peu large pour
+   une info secondaire : on le rattrape avec une marge négative. */
+.meta {
+  margin-top: -6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+}
