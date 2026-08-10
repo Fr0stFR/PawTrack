@@ -1,10 +1,10 @@
 import { useForm, useWatch } from 'react-hook-form'
-import { useApi } from '../hooks/useApi'
-import { useMutation } from '../hooks/useMutation'
-import { apiPost } from '../api'
-import Button from './Button'
-import Field from './Field'
-import styles from './forms.module.css'
+import { useApi } from '@/hooks/useApi'
+import { useMutation } from '@/hooks/useMutation'
+import { apiPost } from '@/api'
+import Button from '@/components/ui/Button'
+import Field from '@/components/ui/Field'
+import styles from '@/styles/forms.module.css'
 
 // Format attendu par l'attribut `max` d'un <input type="date">.
 const TODAY = new Date().toISOString().slice(0, 10)

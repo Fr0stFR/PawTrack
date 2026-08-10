@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import FlashMessage from './FlashMessage'
+import FlashMessage from '@/components/ui/FlashMessage'
 
 /**
  * Coque commune à toutes les pages : affiche le message flash transporté par

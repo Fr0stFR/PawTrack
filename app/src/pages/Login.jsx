@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import FlashMessage from '../components/FlashMessage'
+import FlashMessage from '@/components/ui/FlashMessage'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { apiGet, apiPost } from '../api'
-import Icon from '../components/Icon'
+import { useAuth } from '@/context/AuthContext'
+import { apiGet, apiPost } from '@/api'
+import Icon from '@/components/ui/Icon'
 
 function Login() {
   const [flash, setFlash] = useState(null)

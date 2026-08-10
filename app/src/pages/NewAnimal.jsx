@@ -1,7 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom'
-import Card from '../components/Card'
-import AnimalForm from '../components/AnimalForm'
-import Icon from '../components/Icon'
+import Card from '@/components/ui/Card'
+import AnimalForm from '@/features/animals/AnimalForm'
+import Icon from '@/components/ui/Icon'
 import styles from './NewAnimal.module.css'
 
 /**

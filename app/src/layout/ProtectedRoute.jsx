@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 
 /**
  * Garde d'accès : ne rend ses routes enfants que pour un utilisateur connecté.

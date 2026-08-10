@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import Card from '../components/Card'
-import AsyncSection from '../components/AsyncSection'
-import AnimalList from '../components/AnimalList'
-import MedicalEventList from '../components/MedicalEventList'
-import Icon from '../components/Icon'
-import { useApi } from '../hooks/useApi'
+import Card from '@/components/ui/Card'
+import AsyncSection from '@/components/ui/AsyncSection'
+import AnimalList from '@/features/animals/AnimalList'
+import MedicalEventList from '@/features/medical/MedicalEventList'
+import Icon from '@/components/ui/Icon'
+import { useApi } from '@/hooks/useApi'
 import styles from './Dashboard.module.css'
 
 function Dashboard() {

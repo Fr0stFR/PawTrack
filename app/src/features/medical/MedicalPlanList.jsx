@@ -1,4 +1,4 @@
-import Icon from './Icon'
+import Icon from '@/components/ui/Icon'
 import styles from './MedicalPlanList.module.css'
 
 // Accord en genre et en nombre des unités de fréquence.
