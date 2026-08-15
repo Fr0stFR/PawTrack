@@ -6,6 +6,30 @@
   gap: 16px;
 }
 
+/* Une case à cocher n'est pas habillée par Field : son libellé se place à côté
+   du contrôle, pas au-dessus. */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.loading {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
 .submitError {
   color: var(--danger);
   background: var(--danger-soft);

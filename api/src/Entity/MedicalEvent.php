@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: MedicalEventRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['event:read']],
+    denormalizationContext: ['groups' => ['event:write']],
     operations: [
         new GetCollection(),
         new Get(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
@@ -36,13 +37,24 @@ use Symfony\Component\Serializer\Attribute\Groups;
             securityPostDenormalize: "object.getAnimal().getOwner() == user",
             processor: MedicalEventProcessor::class,
         ),
-        new Put(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
-        new Patch(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
+        // `animal` étant modifiable, les deux contrôles sont nécessaires :
+        // `security` vérifie qu'on possède l'événement d'origine,
+        // `securityPostDenormalize` qu'on possède aussi l'animal de destination.
+        new Put(
+            security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')",
+            securityPostDenormalize: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')",
+            processor: MedicalEventProcessor::class,
+        ),
+        new Patch(
+            security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')",
+            securityPostDenormalize: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')",
+            processor: MedicalEventProcessor::class,
+        ),
         new Delete(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['animal' => 'exact'])]
-#[ApiFilter(OrderFilter::class, properties: ['date'])]
+#[ApiFilter(OrderFilter::class, properties: ['date', 'doneAt'])]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
 #[ApiFilter(BooleanFilter::class, properties: ['isDone'])]
 class MedicalEvent
@@ -54,32 +66,35 @@ class MedicalEvent
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'medicalEvents')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?MedicalType $medicalType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['event:read', 'event:write'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'medicalEvents')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?Animal $animal = null;
 
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?\DateTime $date = null;
 
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?bool $isDone = null;
 
     // Un événement encore à faire n'a pas de date de réalisation.
+    // Lecture seule côté API : la valeur est dérivée de isDone par le processor.
     #[ORM\Column(nullable: true)]
+    #[Groups(['event:read'])]
     private ?\DateTimeImmutable $doneAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'medicalEvents')]

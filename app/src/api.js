@@ -58,3 +58,26 @@ export async function apiPost(path, body) {
   })
   return handleResponse(response)
 }
+
+/**
+ * Mise à jour partielle : seules les clés envoyées sont modifiées, les autres
+ * restent intactes (`null` efface explicitement une valeur).
+ *
+ * @param {string} path Chemin absolu côté API, ex. '/api/medical_events/12'
+ * @param {object} body Champs à modifier
+ * @returns {Promise<object|null>}
+ */
+export async function apiPatch(path, body) {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+      // API Platform refuse le PATCH en 'application/json' (415) : il impose
+      // le type MIME du JSON Merge Patch (RFC 7396).
+      'Content-Type': 'application/merge-patch+json',
+    },
+    body: JSON.stringify(body),
+  })
+  return handleResponse(response)
+}

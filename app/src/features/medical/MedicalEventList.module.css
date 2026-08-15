@@ -10,12 +10,47 @@
 .item {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 8px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-sm);
+
+  /* Le padding vit sur .body et non ici : quand la ligne est cliquable, la
+     zone sensible doit couvrir toute la carte, marges comprises. */
+  overflow: hidden;
+}
+
+/* Deux colonnes : le contenu à gauche, les dates à droite. `baseline` cale la
+   première ligne de chacune sur la même ligne d'écriture, malgré des tailles
+   de police différentes. */
+.body {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+/* Réinitialise l'apparence native du <button> pour qu'il se fonde dans la
+   ligne : seul le comportement du bouton est conservé. */
+.trigger {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Translucide : se superpose proprement au fond rouge d'une ligne en retard
+   comme au fond neutre des autres. */
+.trigger:hover {
+  background: var(--accent-soft);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 /* Événement oublié : on passe l'accent en rouge pour qu'il saute aux yeux. */
@@ -33,9 +68,22 @@
   border-left-color: var(--success);
 }
 
-/* Une ligne du carnet. `baseline` (et non `center`) aligne les textes sur leur
-   ligne d'écriture : indispensable quand on mélange deux tailles de police. */
-.row {
+/* Colonne de gauche : nom au-dessus, type et méta en dessous.
+   `min-width: 0` l'autorise à rétrécir sous la largeur de son texte — sans lui,
+   un nom très long pousserait les dates hors de la carte au lieu de se
+   tronquer. Même réflexe que le min-width:0 de Card. */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Seconde ligne de la colonne de gauche. `baseline` (et non `center`) aligne
+   les textes sur leur ligne d'écriture : indispensable quand on mélange deux
+   tailles de police. */
+.sub {
   display: flex;
   align-items: baseline;
   gap: 8px;
@@ -58,27 +106,40 @@
   color: var(--success);
 }
 
+/* Un nom trop long se tronque au lieu de déborder. C'est le `min-width: 0`
+   de .main qui rend cette troncature possible. */
 .name {
   font-weight: 600;
   color: var(--text-h);
-
-  /* flex:1 → le nom mange toute la place libre et repousse la date à droite.
-     min-width:0 → l'autorise à rétrécir sous la largeur de son texte, sinon
-     un nom très long pousserait la date hors de la carte au lieu de se
-     tronquer. C'est le même réflexe que le min-width:0 de Card. */
-  flex: 1;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.date {
+/* Colonne de droite : date prévue au-dessus, « fait le » en dessous, toutes
+   deux calées sur la marge droite. */
+.dates {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
   flex-shrink: 0;
+}
+
+.date {
   font-size: 0.78rem;
   color: var(--text-muted);
   /* Chiffres à largeur fixe : les dates s'alignent verticalement d'une
      ligne à l'autre, comme dans un vrai registre. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Vert comme le reste de l'historique, mais discret : c'est une précision
+   sur la date au-dessus, pas une information de même rang. */
+.doneAt {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--success);
   font-variant-numeric: tabular-nums;
 }
 

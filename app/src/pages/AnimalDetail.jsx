@@ -32,8 +32,13 @@ function AnimalDetail() {
   // Modifier la taille de page change le chemin, ce qui déclenche le re-fetch.
   const [historyLimit, setHistoryLimit] = useState(HISTORY_STEP)
 
-  // Modale ouverte : null | 'event' | 'plan'.
-  const [openModal, setOpenModal] = useState(null)
+  // Un seul objet décrit la modale ouverte, plutôt que plusieurs états à tenir
+  // cohérents entre eux :
+  //   null                                        → aucune modale
+  //   { kind: 'medicalEvent' }                    → création d'un événement
+  //   { kind: 'medicalEvent', medicalEvent: {…} } → édition de cet événement
+  //   { kind: 'medicalPlan' }                     → création d'une automatisation
+  const [modal, setModal] = useState(null)
 
   const { data: animal, loading, error } = useApi(`/api/animals/${id}`)
 
@@ -43,10 +48,22 @@ function AnimalDetail() {
   const { data: todo, loading: todoLoading, error: todoError, refetch: refetchTodo } =
     useApi(`/api/medical_events?animal=${id}&isDone=false&order[date]=asc`)
 
-  const { data: history, loading: historyLoading, error: historyError } =
+  const { data: history, loading: historyLoading, error: historyError, refetch: refetchHistory } =
     useApi(
-      `/api/medical_events?animal=${id}&isDone=true&order[date]=desc&itemsPerPage=${historyLimit}`,
+      // Historique classé par date de réalisation. `order[date]` départage les
+      // événements cochés dans la même seconde : sans ordre stable, « Voir plus »
+      // pourrait afficher deux fois la même ligne ou en sauter une.
+      `/api/medical_events?animal=${id}&isDone=true&order[doneAt]=desc&order[date]=desc&itemsPerPage=${historyLimit}`,
     )
+
+  // Cocher « c'est fait » fait sortir la ligne d'une liste pour la faire entrer
+  // dans l'autre : les deux doivent être rechargées, quelle que soit l'origine
+  // du clic. C'est la raison d'être de cet état ici plutôt que dans la liste.
+  function handleEventSaved() {
+    setModal(null)
+    refetchTodo()
+    refetchHistory()
+  }
 
   if (loading) return <p className={styles.pageState}>Chargement…</p>
   if (error) return <p className={styles.pageState}>Animal introuvable.</p>
@@ -86,7 +103,11 @@ function AnimalDetail() {
               emptyLabel="Rien à faire pour le moment."
               errorLabel="Impossible de charger les événements à faire."
             >
-              <MedicalEventList events={todo} showAnimal={false} />
+              <MedicalEventList
+                events={todo}
+                showAnimal={false}
+                onSelect={(medicalEvent) => setModal({ kind: 'medicalEvent', medicalEvent })}
+              />
             </AsyncSection>
           </Card>
 
@@ -99,7 +120,11 @@ function AnimalDetail() {
               errorLabel="Impossible de charger l'historique."
             >
               <>
-                <MedicalEventList events={history} showAnimal={false} />
+                <MedicalEventList
+                  events={history}
+                  showAnimal={false}
+                  onSelect={(medicalEvent) => setModal({ kind: 'medicalEvent', medicalEvent })}
+                />
                 {hasMoreHistory && (
                   <button
                     type="button"
@@ -128,37 +153,34 @@ function AnimalDetail() {
           </Card>
 
           <div className={styles.actions}>
-            <Button icon={<Icon name="plus" />} onClick={() => setOpenModal('event')}>
+            <Button icon={<Icon name="plus" />} onClick={() => setModal({ kind: 'medicalEvent' })}>
               Ajouter un élément
             </Button>
-            <Button
-              icon={<Icon name="automation" />}
-              variant="secondary"
-              onClick={() => setOpenModal('plan')}
-            >
+            <Button icon={<Icon name="automation" />} variant="secondary" onClick={() => setModal({ kind: 'medicalPlan' })}>
               Ajouter une automatisation
             </Button>
           </div>
         </div>
       </div>
 
-      {openModal === 'event' && (
-        <Modal title="Ajouter un élément" onClose={() => setOpenModal(null)}>
+      {modal?.kind === 'medicalEvent' && (
+        <Modal
+          title={modal.medicalEvent ? "Modifier l'élément" : 'Ajouter un élément'}
+          onClose={() => setModal(null)}
+        >
           <EventForm
             animalId={id}
-            onSuccess={() => {
-              setOpenModal(null)
-              refetchTodo()
-            }}
+            medicalEvent={modal.medicalEvent}
+            onSuccess={handleEventSaved}
           />
         </Modal>
       )}
-      {openModal === 'plan' && (
-        <Modal title="Ajouter une automatisation" onClose={() => setOpenModal(null)}>
+      {modal?.kind === 'medicalPlan' && (
+        <Modal title="Ajouter une automatisation" onClose={() => setModal(null)}>
           <PlanForm
             animalId={id}
             onSuccess={() => {
-              setOpenModal(null)
+              setModal(null)
               refetchPlans()
             }}
           />

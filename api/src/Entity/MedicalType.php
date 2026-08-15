@@ -31,7 +31,12 @@ class MedicalType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['event:read', 'plan:read'])]
     private ?int $id = null;
+
+    #[ORM\Column(length: 50, unique: true)]
+    #[Groups(['event:read', 'plan:read'])]
+    private ?string $code = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['event:read', 'plan:read'])]
@@ -58,6 +63,18 @@ class MedicalType
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
+
+        return $this;
     }
 
     public function getName(): ?string
