@@ -38,3 +38,23 @@
   background: var(--accent-soft);
   border-color: var(--accent);
 }
+
+/* Variante destructive : réservée aux actions irréversibles, pour que le rouge
+   garde sa valeur d'alerte. */
+.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+.danger:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  filter: brightness(1.1);
+}
+.danger:focus-visible {
+  outline-color: var(--danger);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

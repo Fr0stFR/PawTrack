@@ -4,15 +4,16 @@ import styles from './Button.module.css'
  * Bouton d'action du kit UI.
  *
  * @param {{
- *   variant?: 'primary'|'secondary',
+ *   variant?: 'primary'|'secondary'|'danger',
  *   type?: string,
  *   icon?: React.ReactNode,
  *   children: React.ReactNode
  * }} props Les props restantes (onClick, disabled…) sont transmises au <button>.
  */
 function Button({ variant = 'primary', type = 'button', icon, children, ...props }) {
-  const className =
-    variant === 'secondary' ? `${styles.button} ${styles.secondary}` : styles.button
+  // `primary` n'a pas de classe dédiée : styles.primary vaut undefined et
+  // disparaît au filtrage. Ajouter une variante = ajouter une classe au CSS.
+  const className = [styles.button, styles[variant]].filter(Boolean).join(' ')
 
   return (
     <button type={type} className={className} {...props}>
