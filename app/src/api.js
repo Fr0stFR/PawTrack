@@ -60,6 +60,19 @@ export async function apiPost(path, body) {
 }
 
 /**
+ * @param {string} path Chemin absolu côté API, ex. '/api/medical_events/12'
+ * @returns {Promise<null>} L'API répond 204 sans corps.
+ */
+export async function apiDelete(path) {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
+  })
+  return handleResponse(response)
+}
+
+/**
  * Mise à jour partielle : seules les clés envoyées sont modifiées, les autres
  * restent intactes (`null` efface explicitement une valeur).
  *

@@ -1,0 +1,55 @@
+.confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+/* Pastille d'alerte : le rouge est ici la seule couleur de la boîte, pour que
+   la nature irréversible de l'action se lise avant même le texte. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--radius-pill);
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.detail {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  /* Une ligne de texte courte se lit mieux : on borne la largeur plutôt que
+     de laisser la phrase s'étirer sur toute la modale. */
+  max-width: 34ch;
+}
+
+.error {
+  margin: 0;
+  width: 100%;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}

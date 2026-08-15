@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useApi } from '@/hooks/useApi'
 import { useMutation } from '@/hooks/useMutation'
-import { apiPost, apiPatch } from '@/api'
+import { apiPost, apiPatch, apiDelete } from '@/api'
 import Button from '@/components/ui/Button'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import Field from '@/components/ui/Field'
+import Icon from '@/components/ui/Icon'
 import styles from '@/styles/forms.module.css'
 
 // <input type="date"> n'accepte que 'YYYY-MM-DD', l'API renvoie un ISO complet.
@@ -22,6 +25,10 @@ function toDateInput(iso) {
  */
 function EventForm({ animalId, medicalEvent, onSuccess }) {
   const isEdit = Boolean(medicalEvent)
+
+  // La confirmation remplace le formulaire dans la modale déjà ouverte, plutôt
+  // que d'en empiler une seconde.
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const {
     register,
@@ -49,6 +56,14 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
     { onSuccess },
   )
 
+  // Une seconde mutation, avec son propre `submitting` et sa propre erreur :
+  // mutualiser les deux ferait clignoter « Enregistrement… » pendant une
+  // suppression, et afficherait l'erreur de l'une sous le bouton de l'autre.
+  const { mutate: remove, submitting: deleting, error: deleteError } = useMutation(
+    () => apiDelete(`/api/medical_events/${medicalEvent.id}`),
+    { onSuccess },
+  )
+
   function onSubmit(data) {
     mutate({
       name: data.name,
@@ -62,6 +77,19 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
       // `doneAt` est volontairement absent : MedicalEventProcessor le déduit
       // de `isDone` côté serveur.
     })
+  }
+
+  if (confirmingDelete) {
+    return (
+      <ConfirmDialog
+        title={`Supprimer « ${medicalEvent.name} » ?`}
+        detail="Cet élément et son compte-rendu seront définitivement effacés du carnet."
+        onConfirm={remove}
+        onCancel={() => setConfirmingDelete(false)}
+        submitting={deleting}
+        error={deleteError}
+      />
+    )
   }
 
   // Le <select> ne peut pas retrouver sa valeur par défaut tant que ses <option>
@@ -111,6 +139,20 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
       <Button type="submit" disabled={submitting}>
         {submitting ? 'Enregistrement…' : isEdit ? 'Enregistrer' : 'Ajouter'}
       </Button>
+
+      {/* Rien à supprimer tant que l'élément n'existe pas. Volontairement en
+          retrait du bouton principal : une action destructrice ne doit pas
+          avoir le même poids visuel que l'action attendue. */}
+      {isEdit && (
+        <button
+          type="button"
+          className={styles.deleteLink}
+          onClick={() => setConfirmingDelete(true)}
+        >
+          <Icon name="delete" />
+          Supprimer cet élément
+        </button>
+      )}
     </form>
   )
 }

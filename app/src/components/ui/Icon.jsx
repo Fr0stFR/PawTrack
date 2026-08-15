@@ -8,6 +8,8 @@ import {
   faArrowsRotate,
   faPlus,
   faXmark,
+  faTrash,
+  faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons'
 
 // FontAwesome injecte sa feuille de style au runtime par défaut, ce qui provoque
@@ -25,6 +27,8 @@ const ICONS = {
   automation: faArrowsRotate,
   plus: faPlus,
   close: faXmark,
+  delete: faTrash,
+  warning: faTriangleExclamation,
 }
 
 /**
