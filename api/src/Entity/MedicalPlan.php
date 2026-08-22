@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use App\Repository\MedicalPlanRepository;
+use App\State\MedicalPlanProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,12 +22,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiFilter(SearchFilter::class, properties: ['animal' => 'exact'])]
 #[ApiResource(
     normalizationContext: ['groups' => ['plan:read']],
+    // Sans groupe d'écriture, API Platform accepte n'importe quelle propriété
+    // accessible — `medicalEvents` compris, qu'un client pourrait alors
+    // réaffecter à la main.
+    denormalizationContext: ['groups' => ['plan:write']],
     operations: [
         new GetCollection(),
         new Get(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
         new Post(
             security: "is_granted('ROLE_USER')",
             securityPostDenormalize: "object.getAnimal().getOwner() == user",
+            processor: MedicalPlanProcessor::class,
         ),
         new Put(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
         new Patch(security: "object.getAnimal().getOwner() == user or is_granted('ROLE_ADMIN')"),
@@ -42,30 +48,38 @@ class MedicalPlan
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['plan:read'])]
+    #[Groups(['plan:read', 'plan:write'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'medicalPlans')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['plan:read'])]
+    #[Groups(['plan:read', 'plan:write'])]
     private ?MedicalType $medicalType = null;
 
     // Unité de récurrence, combinée à frequencyValue : ('month', 3) => tous les 3 mois.
     #[ORM\Column(length: 255)]
-    #[Groups(['plan:read'])]
+    #[Groups(['plan:read', 'plan:write'])]
     private ?string $frequency = null;
 
     #[ORM\Column]
-    #[Groups(['plan:read'])]
+    #[Groups(['plan:read', 'plan:write'])]
     private ?int $frequencyValue = null;
 
+    // En écriture seule : le client doit désigner l'animal à la création, mais
+    // il consulte toujours les plans depuis la fiche de cet animal — le relire
+    // dans chaque réponse n'apprendrait rien.
     #[ORM\ManyToOne(inversedBy: 'medicalPlans')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['plan:write'])]
     private ?Animal $animal = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['plan:read'])]
     private ?\DateTimeImmutable $lastExecutedAt = null;
+
+    #[ORM\Column()]
+    #[Groups(['plan:read', 'plan:write'])]
+    private ?\DateTimeImmutable $startsAt = null;
 
     /**
      * @var Collection<int, MedicalEvent>
@@ -151,6 +165,18 @@ class MedicalPlan
     public function setLastExecutedAt(?\DateTimeImmutable $lastExecutedAt): static
     {
         $this->lastExecutedAt = $lastExecutedAt;
+
+        return $this;
+    }
+
+     public function getStartsAt(): ?\DateTimeImmutable
+    {
+        return $this->startsAt;
+    }
+
+    public function setStartsAt(?\DateTimeImmutable $startsAt): static
+    {
+        $this->startsAt = $startsAt;
 
         return $this;
     }

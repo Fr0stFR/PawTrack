@@ -79,10 +79,17 @@ class Animal
     #[ORM\OneToMany(targetEntity: MedicalEvent::class, mappedBy: 'animal')]
     private Collection $medicalEvents;
 
+    /**
+     * @var Collection<int, MedicalPlan>
+     */
+    #[ORM\OneToMany(targetEntity: MedicalPlan::class, mappedBy: 'animal')]
+    private Collection $medicalPlans;
+
     public function __construct()
     {
         $this->weightRecords = new ArrayCollection();
         $this->medicalEvents = new ArrayCollection();
+        $this->medicalPlans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -228,6 +235,36 @@ class Animal
             // set the owning side to null (unless already changed)
             if ($medicalEvent->getAnimal() === $this) {
                 $medicalEvent->setAnimal(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MedicalPlan>
+     */
+    public function getMedicalPlans(): Collection
+    {
+        return $this->medicalPlans;
+    }
+
+    public function addMedicalPlan(MedicalPlan $medicalPlan): static
+    {
+        if (!$this->medicalPlans->contains($medicalPlan)) {
+            $this->medicalPlans->add($medicalPlan);
+            $medicalPlan->setAnimal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedicalPlan(MedicalPlan $medicalPlan): static
+    {
+        if ($this->medicalPlans->removeElement($medicalPlan)) {
+            // set the owning side to null (unless already changed)
+            if ($medicalPlan->getAnimal() === $this) {
+                $medicalPlan->setAnimal(null);
             }
         }
 

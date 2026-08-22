@@ -21,7 +21,7 @@ function Dashboard() {
   return (
     <section className={styles.dashboard}>
       <header className={styles.header}>
-        <h1>Tableau de bord <Icon name="paw" /></h1>
+        <h1>Tableau de bord</h1>
       </header>
 
       <div className={styles.grid}>

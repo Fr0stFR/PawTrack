@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useApi } from '@/hooks/useApi'
 import { useMutation } from '@/hooks/useMutation'
 import { apiPost, apiPatch, apiDelete } from '@/api'
@@ -33,6 +33,7 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     // Équivalent React du `createForm(EventType::class, $event)` de Symfony :
@@ -43,8 +44,11 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
       date: toDateInput(medicalEvent?.date),
       description: medicalEvent?.description ?? '',
       isDone: medicalEvent?.isDone ?? false,
+      doneAt: toDateInput(medicalEvent?.doneAt) || new Date().toLocaleDateString('sv-SE'),
     },
   })
+
+  const isDone = useWatch({ control, name: 'isDone' })
 
   const { data: types } = useApi('/api/medical_types')
 
@@ -74,8 +78,8 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
       // Chaîne vide → null : on efface la valeur côté API plutôt que d'y
       // stocker une chaîne vide qui se ferait passer pour une description.
       description: data.description || null,
-      // `doneAt` est volontairement absent : MedicalEventProcessor le déduit
-      // de `isDone` côté serveur.
+      // Facultatif côté API : omis, le processor retombe sur maintenant.
+      doneAt: data.doneAt || null,
     })
   }
 
@@ -117,7 +121,7 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
         </select>
       </Field>
 
-      <Field label="Date" error={errors.date}>
+      <Field label="Date prévue" error={errors.date}>
         <input type="date" {...register('date', { required: 'La date est requise' })} />
       </Field>
 
@@ -133,6 +137,17 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
         <input type="checkbox" {...register('isDone')} />
         <span>C’est fait</span>
       </label>
+
+      {isDone && (
+        <Field label="Fait le" error={errors.doneAt}>
+          <input
+            type="date"
+            {...register('doneAt', {
+              required: 'Indique quand ça a été fait',
+            })}
+          />
+        </Field>
+      )}
 
       {submitError && <p className={styles.submitError}>{submitError}</p>}
 

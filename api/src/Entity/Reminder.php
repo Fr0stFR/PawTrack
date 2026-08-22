@@ -23,7 +23,9 @@ class Reminder
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $sentAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'reminders')]
+    // Unidirectionnelle : les rappels à envoyer se cherchent par échéance via le
+    // repository, jamais en partant d'un utilisateur.
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
