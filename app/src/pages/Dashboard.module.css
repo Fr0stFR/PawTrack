@@ -48,6 +48,7 @@
   grid-template-columns: 7fr 3fr;
   gap: 24px;
   align-items: start;
+  margin-top: 30px;
 
   /* Mobile : les deux panneaux passent l'un sous l'autre. */
   @media (max-width: 768px) {

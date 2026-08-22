@@ -13,6 +13,11 @@ const UNITS = [
   { value: 'year', label: 'an(s)' },
 ]
 
+function getDefaultDate() {
+  // 'sv-SE' est le seul format de locale qui sorte du YYYY-MM-DD, et il reste en heure locale.
+  return new Date().toLocaleDateString('sv-SE')
+}
+
 /**
  * Formulaire de création d'un soin récurrent (MedicalPlan).
  *
@@ -23,7 +28,11 @@ function PlanForm({ animalId, onSuccess }) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues: {
+      startsAt: getDefaultDate(),
+    },
+  })
 
   const { data: types } = useApi('/api/medical_types')
 
@@ -39,6 +48,7 @@ function PlanForm({ animalId, onSuccess }) {
       animal: `/api/animals/${animalId}`,
       frequency: data.frequency,
       frequencyValue: data.frequencyValue,
+      startsAt: data.startsAt,
     })
   }
 
@@ -85,6 +95,10 @@ function PlanForm({ animalId, onSuccess }) {
             </option>
           ))}
         </select>
+      </Field>
+      
+      <Field label="Première échéance le" error={errors.startsAt}>
+        <input type="date" {...register('startsAt', { required: 'La date est requise' })} />
       </Field>
 
       {submitError && <p className={styles.submitError}>{submitError}</p>}

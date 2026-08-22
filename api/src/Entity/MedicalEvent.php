@@ -92,16 +92,23 @@ class MedicalEvent
     private ?bool $isDone = null;
 
     // Un événement encore à faire n'a pas de date de réalisation.
-    // Lecture seule côté API : la valeur est dérivée de isDone par le processor.
+    //
+    // Écrivable, mais facultatif : omis, le processor le fixe à maintenant. Sans
+    // ça, la date de réalisation serait en fait la date de *saisie* — et un soin
+    // récurrent noté avec trois semaines de retard décalerait toute sa série
+    // d'autant, sans que personne ne s'en aperçoive.
     #[ORM\Column(nullable: true)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'event:write'])]
     private ?\DateTimeImmutable $doneAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'medicalEvents')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
-    #[ORM\ManyToOne(inversedBy: 'medicalEvents')]
+    // Unidirectionnelle : User#medicalEvents est déjà l'inverse de `createdBy`,
+    // et rien n'a besoin de remonter d'un vétérinaire vers ses actes. Le jour où
+    // ROLE_VET arrivera, on ajoutera une collection dédiée côté User.
+    #[ORM\ManyToOne]
     private ?User $veterinarian = null;
 
     #[ORM\ManyToOne(inversedBy: 'medicalEvents')]

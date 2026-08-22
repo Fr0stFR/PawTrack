@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\MedicalEvent;
+use App\Entity\MedicalPlan;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,5 +32,23 @@ class MedicalEventRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Un plan a-t-il encore une échéance en attente ?
+     *
+     * Pendant du NOT EXISTS de MedicalPlanRepository::findNeedingOccurrence(),
+     * mais pour un seul plan : la question se pose aussi hors du cron, dès qu'on
+     * vient de cocher une occurrence comme faite.
+     */
+    public function hasOpenOccurrence(MedicalPlan $plan): bool
+    {
+        return (bool) $this->createQueryBuilder('me')
+            ->select('COUNT(me.id)')
+            ->andWhere('me.medicalPlan = :plan')
+            ->andWhere('me.isDone = false')
+            ->setParameter('plan', $plan)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
