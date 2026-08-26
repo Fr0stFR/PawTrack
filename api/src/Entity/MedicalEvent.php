@@ -115,9 +115,14 @@ class MedicalEvent
     private ?MedicalPlan $medicalPlan = null;
 
     /**
+     * Les rappels n'ont pas d'existence propre : ils ne veulent rien dire sans
+     * leur échéance. D'où `cascade: remove` (supprimer l'événement supprime ses
+     * rappels) et `orphanRemoval` (les sortir de la collection les supprime
+     * aussi, au lieu de les laisser avec une clé étrangère NOT NULL orpheline).
+     *
      * @var Collection<int, Reminder>
      */
-    #[ORM\OneToMany(targetEntity: Reminder::class, mappedBy: 'medicalEvent')]
+    #[ORM\OneToMany(targetEntity: Reminder::class, mappedBy: 'medicalEvent', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $reminders;
 
     public function __construct()
