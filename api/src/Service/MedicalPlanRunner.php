@@ -28,6 +28,7 @@ class MedicalPlanRunner
     public function __construct(
         private readonly MedicalPlanRepository $medicalPlanRepository,
         private readonly MedicalEventRepository $medicalEventRepository,
+        private readonly ReminderScheduler $reminderScheduler,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -86,6 +87,12 @@ class MedicalPlanRunner
             ->setDate($this->nextDueDate($plan))
             ->setIsDone(false)
             ->setCreatedBy($plan->getAnimal()->getOwner());
+
+        // Une échéance engendrée par un plan ne passe pas par l'API, donc pas
+        // par MedicalEventProcessor : sans cet appel, le vermifuge créé cette
+        // nuit naîtrait sans le moindre rappel. Panne muette par excellence,
+        // invisible tant qu'on teste à la main depuis l'interface.
+        $this->reminderScheduler->sync($event);
 
         $this->em->persist($event);
 

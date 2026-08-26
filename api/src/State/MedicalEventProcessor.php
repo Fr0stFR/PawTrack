@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\MedicalEvent;
 use App\Service\MedicalPlanRunner;
+use App\Service\ReminderScheduler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -20,6 +21,7 @@ class MedicalEventProcessor implements ProcessorInterface
         private readonly EntityManagerInterface $em,
         private readonly Security $security,
         private readonly MedicalPlanRunner $planRunner,
+        private readonly ReminderScheduler $reminderScheduler,
     ) {
     }
 
@@ -37,6 +39,11 @@ class MedicalEventProcessor implements ProcessorInterface
         } else {
             $data->setDoneAt(null);
         }
+
+        // Remet les rappels en accord avec l'échéance. Appelé sans condition :
+        // création, changement de date, validation, dé-validation donnent tous
+        // le même appel, c'est le scheduler qui constate ce qu'il y a à faire.
+        $this->reminderScheduler->sync($data);
 
         $this->em->persist($data);
         $this->em->flush();
