@@ -1,0 +1,46 @@
+{# Digest matinal : tous les rappels dus d'un même utilisateur en un seul mail.
+
+   Styles en attributs `style=` plutôt qu'en <style> : les clients mail
+   (Gmail en tête) suppriment ou ignorent les feuilles de style, et rien
+   ne remplace le CSS inline en HTML d'email.
+
+   `lines` est préparé par ReminderSender : le template choisit une formulation,
+   il ne calcule rien. Une différence de dates dans un template est presque
+   toujours le signe qu'on a mis la logique du mauvais côté. #}
+<div style="font-family: Arial, Helvetica, sans-serif; color: #1f2933; max-width: 560px;">
+
+    <p>Bonjour,</p>
+
+    <p>
+        {% if lines|length == 1 %}
+            Un soin arrive à échéance :
+        {% else %}
+            {{ lines|length }} soins arrivent à échéance :
+        {% endif %}
+    </p>
+
+    <ul style="padding-left: 18px;">
+        {% for line in lines %}
+            <li style="margin-bottom: 10px;">
+                <strong>{{ line.event.name }}</strong> pour {{ line.event.animal.name }}<br>
+                {# 'd/m/Y' : la date d'une échéance est une date civile, pas un instant. #}
+                le {{ line.event.date|date('d/m/Y') }}
+                <span style="color: #616e7c;">
+                    {%- if line.daysUntil < 0 %}
+                        (en retard)
+                    {%- elseif line.daysUntil == 0 %}
+                        (c'est aujourd'hui)
+                    {%- elseif line.daysUntil == 1 %}
+                        (c'est demain)
+                    {%- else %}
+                        (dans {{ line.daysUntil }} jours)
+                    {%- endif %}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p style="color: #616e7c; font-size: 13px;">
+        — PawTrack
+    </p>
+</div>

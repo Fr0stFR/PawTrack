@@ -9,14 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * Point d'entrée CLI de ReminderScheduler, destiné à être appelé quotidiennement,
- * après app:plans:run — les échéances engendrées cette nuit portent déjà leurs
- * rappels, mais l'ordre inverse ferait attendre un jour à celles créées ensuite.
- *
- * Comme sa jumelle, elle ne contient aucune logique métier : rejouable à volonté,
- * elle ne fait rien quand tout est en règle.
- */
 #[AsCommand(
     name: 'app:reminders:sync',
     description: 'Remet les rappels en accord avec la date de leur échéance',
