@@ -9,13 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * Point d'entrée CLI de MedicalPlanRunner, destiné à être appelé quotidiennement.
- *
- * Volontairement sans logique métier : le déclencheur (crontab, Symfony
- * Scheduler, CronJob Kubernetes…) est un choix de déploiement qui ne doit
- * jamais remonter jusqu'au code.
- */
 #[AsCommand(
     name: 'app:plans:run',
     description: 'Engendre les échéances manquantes des soins récurrents',
