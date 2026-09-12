@@ -74,6 +74,11 @@ class MedicalEvent
     #[Groups(['event:read', 'event:write'])]
     private ?MedicalType $medicalType = null;
 
+    
+    #[ORM\ManyToOne]
+    #[Groups(['event:read', 'event:write'])]
+    private ?Protection $protection = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['event:read', 'event:write'])]
     private ?string $description = null;
@@ -293,4 +298,17 @@ class MedicalEvent
 
         return $this;
     }
+
+    public function getProtection(): ?Protection
+    {
+        return $this->protection;
+    }
+
+    public function setProtection(?Protection $protection): static
+    {
+        $this->protection = $protection;
+
+        return $this;
+    }
+
 }

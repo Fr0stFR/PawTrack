@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Animal;
 use App\Entity\MedicalEvent;
 use App\Entity\MedicalPlan;
 use App\Entity\Reminder;
@@ -88,5 +89,37 @@ class MedicalEventRepository extends ServiceEntityRepository
             ->orWhere(sprintf('EXISTS (%s)', $pendingReminder->getDQL()))
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Pour un animal, la date du dernier acte réalisé de chaque protection.
+     *
+     * Une seule requête agrégée, et non une par protection. Seuls les événements
+     * faits comptent : un acte prévu ne protège de rien.
+     *
+     * @return array<int, \DateTimeImmutable> indexé par id de protection
+     */
+    public function findLastDoneAtByProtection(Animal $animal): array
+    {
+        $rows = $this->createQueryBuilder('me')
+            ->select('IDENTITY(me.protection) AS protectionId', 'MAX(me.doneAt) AS lastDoneAt')
+            ->where('me.animal = :animal')
+            ->andWhere('me.isDone = true')
+            ->andWhere('me.protection IS NOT NULL')
+            ->andWhere('me.doneAt IS NOT NULL')
+            ->groupBy('me.protection')
+            ->setParameter('animal', $animal)
+            ->getQuery()
+            ->getResult();
+
+        $lastDoneAt = [];
+
+        foreach ($rows as $row) {
+            // MAX() sur une colonne datetime renvoie une chaîne : Doctrine ne
+            // retype pas le résultat d'un agrégat.
+            $lastDoneAt[(int) $row['protectionId']] = new \DateTimeImmutable($row['lastDoneAt']);
+        }
+
+        return $lastDoneAt;
     }
 }

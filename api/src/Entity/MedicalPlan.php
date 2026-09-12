@@ -56,6 +56,10 @@ class MedicalPlan
     #[Groups(['plan:read', 'plan:write'])]
     private ?MedicalType $medicalType = null;
 
+    #[ORM\ManyToOne]
+    #[Groups(['plan:read', 'plan:write'])]
+    private ?Protection $protection = null;
+
     // Unité de récurrence, combinée à frequencyValue : ('month', 3) => tous les 3 mois.
     #[ORM\Column(length: 255)]
     #[Groups(['plan:read', 'plan:write'])]
@@ -210,4 +214,17 @@ class MedicalPlan
 
         return $this;
     }
+
+    public function getProtection(): ?Protection
+    {
+        return $this->protection;
+    }
+
+    public function setProtection(?Protection $protection): static
+    {
+        $this->protection = $protection;
+
+        return $this;
+    }
+
 }
