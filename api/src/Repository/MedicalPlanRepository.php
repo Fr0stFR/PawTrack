@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Animal;
 use App\Entity\MedicalEvent;
 use App\Entity\MedicalPlan;
 use App\Entity\User;
@@ -52,5 +53,38 @@ class MedicalPlanRepository extends ServiceEntityRepository
         return $qb->andWhere($qb->expr()->not($qb->expr()->exists($sub->getDQL())))
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Pour un animal, la durée retenue pour chaque protection qu'il entretient.
+     *
+     * Alimente le calcul « à jour ? », où la fréquence du plan prime sur
+     * Protection::$defaultFrequency. Plusieurs plans peuvent viser la même
+     * protection : le tri par id croissant fait gagner le plus récent, chaque
+     * ligne écrasant la précédente dans le tableau indexé.
+     *
+     * @return array<int, array{frequency: string, value: int}> indexé par id de protection
+     */
+    public function findDurationsByProtection(Animal $animal): array
+    {
+        $rows = $this->createQueryBuilder('mp')
+            ->select('IDENTITY(mp.protection) AS protectionId', 'mp.frequency', 'mp.frequencyValue')
+            ->where('mp.animal = :animal')
+            ->andWhere('mp.protection IS NOT NULL')
+            ->orderBy('mp.id', 'ASC')
+            ->setParameter('animal', $animal)
+            ->getQuery()
+            ->getResult();
+
+        $durations = [];
+
+        foreach ($rows as $row) {
+            $durations[(int) $row['protectionId']] = [
+                'frequency' => $row['frequency'],
+                'value' => (int) $row['frequencyValue'],
+            ];
+        }
+
+        return $durations;
     }
 }

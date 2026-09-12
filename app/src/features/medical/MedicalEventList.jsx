@@ -1,3 +1,4 @@
+import Icon from '@/components/ui/Icon'
 import styles from './MedicalEventList.module.css'
 
 function formatDate(iso) {
@@ -21,13 +22,17 @@ function isSameDay(a, b) {
  * Le composant ne connaît ni l'API ni la notion de « fait » : il signale
  * seulement qu'une ligne a été choisie, et laisse le parent décider de la suite.
  *
+ * `onValidate` ajoute un raccourci sur les lignes ouvertes, distinct de
+ * `onSelect` : la ligne ouvre l'édition, le ✓ enregistre une visite.
+ *
  * @param {{
  *   events: Array<object>,
  *   showAnimal?: boolean,
- *   onSelect?: (event: object) => void
+ *   onSelect?: (event: object) => void,
+ *   onValidate?: (event: object) => void
  * }} props showAnimal masque le nom de l'animal lorsqu'on est déjà sur sa fiche.
  */
-function MedicalEventList({ events, showAnimal = true, onSelect }) {
+function MedicalEventList({ events, showAnimal = true, onSelect, onValidate }) {
   return (
     <ul className={styles.list}>
       {events.map((event) => {
@@ -73,20 +78,33 @@ function MedicalEventList({ events, showAnimal = true, onSelect }) {
 
         return (
           <li key={event.id} className={itemClass}>
-            {/* Un vrai <button> plutôt qu'un onClick sur le <li> : on hérite
-                gratuitement du focus clavier, de la touche Entrée et de
-                l'annonce aux lecteurs d'écran. */}
-            {onSelect ? (
-              <button
-                type="button"
-                className={`${styles.body} ${styles.trigger}`}
-                onClick={() => onSelect(event)}
-              >
-                {content}
-              </button>
-            ) : (
-              <div className={styles.body}>{content}</div>
-            )}
+            {/* Côte à côte et non imbriquées : un <button> dans un <button>
+                est du HTML invalide. */}
+            <div className={styles.row}>
+              {onSelect ? (
+                <button
+                  type="button"
+                  className={`${styles.body} ${styles.trigger}`}
+                  onClick={() => onSelect(event)}
+                >
+                  {content}
+                </button>
+              ) : (
+                <div className={styles.body}>{content}</div>
+              )}
+
+              {onValidate && !event.isDone && (
+                <button
+                  type="button"
+                  className={styles.validate}
+                  onClick={() => onValidate(event)}
+                  title="Marquer comme fait"
+                  aria-label={`Marquer « ${event.name} » comme fait`}
+                >
+                  <Icon name="visit" />
+                </button>
+              )}
+            </div>
           </li>
         )
       })}

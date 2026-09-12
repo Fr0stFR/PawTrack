@@ -83,6 +83,7 @@ class MedicalPlanRunner
             ->setMedicalPlan($plan)
             ->setAnimal($plan->getAnimal())
             ->setMedicalType($plan->getMedicalType())
+            ->setProtection($plan->getProtection())
             ->setName($plan->getName())
             ->setDate($this->nextDueDate($plan))
             ->setIsDone(false)

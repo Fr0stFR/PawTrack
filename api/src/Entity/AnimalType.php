@@ -13,6 +13,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AnimalTypeRepository::class)]
 #[ApiResource(
+    // Sans ce groupe, les collections inverses (`animals`, `medicalEvents`…)
+    // seraient publiées : charge utile croissant avec toute la base.
+    normalizationContext: ['groups' => ['ref:read']],
     operations: [
         new GetCollection(),
         new Get(),
@@ -23,11 +26,12 @@ class AnimalType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['ref:read'])]
     private ?int $id = null;
 
     // Embarque le libellé dans la réponse d'un Animal plutôt qu'une IRI.
     #[ORM\Column(length: 255)]
-    #[Groups(['animal:read'])]
+    #[Groups(['ref:read', 'animal:read'])]
     private ?string $name = null;
 
     /**

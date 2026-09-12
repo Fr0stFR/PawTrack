@@ -17,13 +17,16 @@ function toDateInput(iso) {
 /**
  * Formulaire d'un événement médical, en création ou en édition.
  *
+ * `animalTypeIri` filtre les protections proposées sur l'espèce de l'animal.
+ *
  * @param {{
  *   animalId: string,
+ *   animalTypeIri?: string,
  *   medicalEvent?: object,
  *   onSuccess: (medicalEvent: object) => void
  * }} props `medicalEvent` absent = création (POST), présent = édition (PATCH).
  */
-function EventForm({ animalId, medicalEvent, onSuccess }) {
+function EventForm({ animalId, animalTypeIri, medicalEvent, onSuccess }) {
   const isEdit = Boolean(medicalEvent)
 
   // La confirmation remplace le formulaire dans la modale déjà ouverte, plutôt
@@ -41,6 +44,8 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
     defaultValues: {
       name: medicalEvent?.name ?? '',
       medicalType: medicalEvent ? String(medicalEvent.medicalType.id) : '',
+      // Chaîne vide = « aucune » : une visite de contrôle ne protège de rien.
+      protection: medicalEvent?.protection ? String(medicalEvent.protection.id) : '',
       date: toDateInput(medicalEvent?.date),
       description: medicalEvent?.description ?? '',
       isDone: medicalEvent?.isDone ?? false,
@@ -49,8 +54,12 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
   })
 
   const isDone = useWatch({ control, name: 'isDone' })
+  const protectionId = useWatch({ control, name: 'protection' })
 
   const { data: types } = useApi('/api/medical_types')
+  const { data: protections } = useApi(`/api/protections?animalTypes=${animalTypeIri}`)
+
+  const selectedProtection = protections?.find((p) => String(p.id) === protectionId)
 
   const { mutate, submitting, error: submitError } = useMutation(
     (body) =>
@@ -72,6 +81,7 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
     mutate({
       name: data.name,
       medicalType: `/api/medical_types/${data.medicalType}`,
+      protection: data.protection ? `/api/protections/${data.protection}` : null,
       animal: `/api/animals/${animalId}`,
       date: data.date,
       isDone: data.isDone,
@@ -97,8 +107,8 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
   }
 
   // Le <select> ne peut pas retrouver sa valeur par défaut tant que ses <option>
-  // n'existent pas : on attend la liste des types avant de monter le formulaire.
-  if (!types) return <p className={styles.loading}>Chargement…</p>
+  // n'existent pas : on attend les deux référentiels avant de monter le formulaire.
+  if (!types || !protections) return <p className={styles.loading}>Chargement…</p>
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
@@ -116,6 +126,21 @@ function EventForm({ animalId, medicalEvent, onSuccess }) {
           {types.map((type) => (
             <option key={type.id} value={type.id}>
               {type.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field
+        label="Protection (facultatif)"
+        error={errors.protection}
+        hint={selectedProtection?.description}
+      >
+        <select {...register('protection')}>
+          <option value="">— Aucune —</option>
+          {protections.map((protection) => (
+            <option key={protection.id} value={protection.id}>
+              {protection.name}
             </option>
           ))}
         </select>

@@ -20,6 +20,12 @@
   overflow: hidden;
 }
 
+/* Les deux actions côte à côte : ouvrir l'édition, ou valider. */
+.row {
+  display: flex;
+  align-items: stretch;
+}
+
 /* Deux colonnes : le contenu à gauche, les dates à droite. `baseline` cale la
    première ligne de chacune sur la même ligne d'écriture, malgré des tailles
    de police différentes. */
@@ -50,6 +56,28 @@
 
 .trigger:focus-visible {
   outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Raccourci de validation : discret au repos, vert au survol. */
+.validate {
+  flex-shrink: 0;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: none;
+  padding: 0 14px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.validate:hover {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.validate:focus-visible {
+  outline: 2px solid var(--success);
   outline-offset: -2px;
 }
 

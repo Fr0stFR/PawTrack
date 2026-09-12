@@ -1,0 +1,81 @@
+/* `auto-fill` plutôt qu'une media query : le nombre de colonnes suit la place
+   disponible, pas la largeur de la fenêtre — le composant peut être placé aussi
+   bien dans une colonne étroite qu'en pleine largeur. */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  column-gap: 24px;
+}
+
+/* Trois colonnes : la pastille, le corps qui s'étire, le libellé calé à droite.
+   `1fr` sur la colonne centrale suffit à aligner tous les libellés entre eux
+   sans largeur fixe à deviner. */
+.item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  /* Sous chaque ligne : en grille multi-colonnes, `.item + .item` placerait le
+     trait au mauvais endroit. */
+  border-bottom: 1px solid var(--border);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  /* Pastille et libellé partagent la classe d'état : la couleur n'est définie
+     qu'une fois, plus bas. */
+  background: currentColor;
+  /* `baseline` ne cale rien sur un élément vide. */
+  transform: translateY(-2px);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 0.9rem;
+  color: var(--text-h);
+  /* Un nom trop long coupe plutôt qu'il ne pousse la colonne de droite. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Les quatre états. Pas de jeton « warning » dans le thème : l'accent corail
+   joue ce rôle, il se situe naturellement entre le vert et le rouge. */
+.expired {
+  color: var(--danger);
+}
+
+.soon {
+  color: var(--accent);
+}
+
+.ok {
+  color: var(--success);
+}
+
+.never {
+  color: var(--text-muted);
+}

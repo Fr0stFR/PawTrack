@@ -3,12 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use App\Repository\MedicalTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -17,13 +13,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MedicalTypeRepository::class)]
 #[ApiResource(
+    normalizationContext: ['groups' => ['ref:read']],
     operations: [
         new GetCollection(),
-        new Get(),
-        new Post(security: "is_granted('ROLE_ADMIN')"),
-        new Put(security: "is_granted('ROLE_ADMIN')"),
-        new Patch(security: "is_granted('ROLE_ADMIN')"),
-        new Delete(security: "is_granted('ROLE_ADMIN')"),
+        new Get(), 
     ]
 )]
 class MedicalType
@@ -31,15 +24,15 @@ class MedicalType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read', 'plan:read'])]
+    #[Groups(['ref:read', 'event:read', 'plan:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Groups(['event:read', 'plan:read'])]
+    #[Groups(['ref:read', 'event:read', 'plan:read'])]
     private ?string $code = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read', 'plan:read'])]
+    #[Groups(['ref:read', 'event:read', 'plan:read'])]
     private ?string $name = null;
 
     /**

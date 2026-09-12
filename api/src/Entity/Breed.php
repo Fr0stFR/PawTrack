@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: BreedRepository::class)]
 #[ApiResource(
+    normalizationContext: ['groups' => ['ref:read']],
     operations: [
         new GetCollection(),
         new Get(),
@@ -26,12 +27,13 @@ class Breed
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['ref:read'])]
     private ?int $id = null;
 
     // `animalType` reste hors du groupe : l'espèce est déjà portée par
     // l'animal, l'embarquer ici dupliquerait la donnée.
     #[ORM\Column(length: 255)]
-    #[Groups(['animal:read'])]
+    #[Groups(['ref:read', 'animal:read'])]
     private ?string $name = null;
 
     /**

@@ -10,6 +10,7 @@ import {
   faXmark,
   faTrash,
   faTriangleExclamation,
+  faCircleCheck,
 } from '@fortawesome/free-solid-svg-icons'
 
 // FontAwesome injecte sa feuille de style au runtime par défaut, ce qui provoque
@@ -29,6 +30,7 @@ const ICONS = {
   close: faXmark,
   delete: faTrash,
   warning: faTriangleExclamation,
+  visit: faCircleCheck,
 }
 
 /**

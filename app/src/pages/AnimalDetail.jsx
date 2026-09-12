@@ -9,6 +9,8 @@ import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import EventForm from '@/features/medical/EventForm'
 import PlanForm from '@/features/medical/PlanForm'
+import VisitForm from '@/features/medical/VisitForm'
+import ProtectionStatusList from '@/features/health/ProtectionStatusList'
 import Icon from '@/components/ui/Icon'
 import styles from './AnimalDetail.module.css'
 
@@ -21,6 +23,24 @@ function formatDate(iso) {
     month: 'long',
     year: 'numeric',
   })
+}
+
+/** Âge en clair : « 2 ans », ou en mois avant le premier anniversaire. */
+function formatAge(iso) {
+  const birth = new Date(iso)
+  const now = new Date()
+
+  let months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth())
+
+  // Le mois en cours ne compte que s'il est révolu au jour près.
+  if (now.getDate() < birth.getDate()) months -= 1
+
+  if (months < 0) return ''
+  if (months < 12) return `${months} mois`
+
+  const years = Math.floor(months / 12)
+
+  return `${years} an${years > 1 ? 's' : ''}`
 }
 
 /**
@@ -41,6 +61,15 @@ function AnimalDetail() {
   const [modal, setModal] = useState(null)
 
   const { data: animal, loading, error } = useApi(`/api/animals/${id}`)
+
+  // Dérivé côté serveur des événements faits et des plans : toute écriture sur
+  // l'un ou l'autre doit le faire recharger.
+  const {
+    data: statuses,
+    loading: statusesLoading,
+    error: statusesError,
+    refetch: refetchStatuses,
+  } = useApi(`/api/animals/${id}/protection_statuses`)
 
   const { data: plans, loading: plansLoading, error: plansError, refetch: refetchPlans } =
     useApi(`/api/medical_plans?animal=${id}`)
@@ -63,6 +92,7 @@ function AnimalDetail() {
     setModal(null)
     refetchTodo()
     refetchHistory()
+    refetchStatuses()
   }
 
   if (loading) return <p className={styles.pageState}>Chargement…</p>
@@ -77,19 +107,48 @@ function AnimalDetail() {
       <Link to="/dashboard" className={styles.back}>← Retour au tableau de bord</Link>
 
       <header className={styles.header}>
-        <span className={styles.avatar}><Icon name="paw" /></span>
-        <div>
-          <h1>{animal.name}</h1>
-          <p className={styles.meta}>
-            {[
-              animal.animalType?.name,
-              animal.breed?.name,
-              GENDERS[animal.gender] ?? animal.gender,
-              `Né${animal.gender === 'F' ? 'e' : ''} le ${formatDate(animal.birthdate)}`,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
+        <div className={styles.identity}>
+          <div className={styles.identityHead}>
+            <span className={styles.avatar}><Icon name="paw" /></span>
+            <h1>{animal.name}</h1>
+          </div>
+
+          {/* Chaque paire enveloppée dans un <div> : HTML5 l'autorise et ça
+              permet de les placer en grille sans casser l'association dt/dd. */}
+          <dl className={styles.facts}>
+            <div>
+              <dt>Espèce</dt>
+              <dd>{animal.animalType?.name ?? '—'}</dd>
+            </div>
+            <div>
+              <dt>Race</dt>
+              <dd>{animal.breed?.name ?? '—'}</dd>
+            </div>
+            <div>
+              <dt>Sexe</dt>
+              <dd>{GENDERS[animal.gender] ?? animal.gender ?? '—'}</dd>
+            </div>
+            <div>
+              <dt>Naissance</dt>
+              <dd>
+                {formatDate(animal.birthdate)}
+                <span className={styles.age}>{formatAge(animal.birthdate)}</span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className={styles.protections}>
+          <h2 className={styles.protectionsTitle}>Protections</h2>
+          <AsyncSection
+            loading={statusesLoading}
+            error={statusesError}
+            isEmpty={statuses?.length === 0}
+            emptyLabel="Aucune protection référencée pour cette espèce."
+            errorLabel="Impossible de charger l'état des protections."
+          >
+            <ProtectionStatusList statuses={statuses} />
+          </AsyncSection>
         </div>
       </header>
 
@@ -107,6 +166,7 @@ function AnimalDetail() {
                 events={todo}
                 showAnimal={false}
                 onSelect={(medicalEvent) => setModal({ kind: 'medicalEvent', medicalEvent })}
+                onValidate={(medicalEvent) => setModal({ kind: 'visit', medicalEvent })}
               />
             </AsyncSection>
           </Card>
@@ -156,6 +216,16 @@ function AnimalDetail() {
             <Button icon={<Icon name="plus" />} onClick={() => setModal({ kind: 'medicalEvent' })}>
               Ajouter un élément
             </Button>
+            {/* Sans échéance ouverte, la modale serait vide. */}
+            {todo?.length > 0 && (
+              <Button
+                icon={<Icon name="visit" />}
+                variant="secondary"
+                onClick={() => setModal({ kind: 'visit' })}
+              >
+                Enregistrer une visite
+              </Button>
+            )}
             <Button icon={<Icon name="automation" />} variant="secondary" onClick={() => setModal({ kind: 'medicalPlan' })}>
               Ajouter une automatisation
             </Button>
@@ -170,7 +240,17 @@ function AnimalDetail() {
         >
           <EventForm
             animalId={id}
+            animalTypeIri={animal.animalType['@id']}
             medicalEvent={modal.medicalEvent}
+            onSuccess={handleEventSaved}
+          />
+        </Modal>
+      )}
+      {modal?.kind === 'visit' && (
+        <Modal title="Enregistrer une visite" onClose={() => setModal(null)}>
+          <VisitForm
+            events={todo}
+            preselectedId={modal.medicalEvent?.id}
             onSuccess={handleEventSaved}
           />
         </Modal>
@@ -179,9 +259,13 @@ function AnimalDetail() {
         <Modal title="Ajouter une automatisation" onClose={() => setModal(null)}>
           <PlanForm
             animalId={id}
+            animalTypeIri={animal.animalType['@id']}
             onSuccess={() => {
               setModal(null)
               refetchPlans()
+              // La fréquence du plan prime sur la durée par défaut : créer un
+              // plan peut changer une date d'expiration affichée au-dessus.
+              refetchStatuses()
             }}
           />
         </Modal>
