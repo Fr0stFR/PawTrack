@@ -33,11 +33,6 @@ class MedicalPlanRepository extends ServiceEntityRepository
      * Les plans qui n'ont plus aucune occurrence ouverte, donc dont la prochaine
      * échéance reste à engendrer.
      *
-     * La question posée est « existe-t-il un événement non-fait ? », pas « combien
-     * y en a-t-il » : un NOT EXISTS l'exprime tel quel, là où un LEFT JOIN
-     * imposerait de placer `e.isDone = false` dans le ON — et non dans le WHERE,
-     * sous peine de transformer la jointure en INNER JOIN silencieux.
-     *
      * @return MedicalPlan[]
      */
     public function findNeedingOccurrence(): array
