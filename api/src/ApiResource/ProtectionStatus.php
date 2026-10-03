@@ -29,8 +29,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
             provider: ProtectionStatusProvider::class,
         ),
     ],
-    // Une ressource imbriquée est sérialisée avec le contexte du parent : les
-    // champs de Protection à publier ici portent donc `health:read`.
     normalizationContext: ['groups' => ['health:read']],
 )]
 class ProtectionStatus
